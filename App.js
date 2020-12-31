@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import {SafeAreaView, StyleSheet, StatusBar} from 'react-native';
+import {SafeAreaView, StyleSheet, StatusBar, Text} from 'react-native';
 import ChartViewer from './components/ChartViewer';
 
 const App = () => {
@@ -15,6 +15,7 @@ const App = () => {
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.body}>
+        <Text style={styles.header}>Hello Barchart</Text>
         <ChartViewer />
       </SafeAreaView>
     </>
@@ -28,6 +29,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  header: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginVertical: 16,
+  }
 });
 
 export default App;
