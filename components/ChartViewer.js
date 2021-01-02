@@ -2,7 +2,9 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import FruitData from './FruitData';
 import {scaleLinear, scaleBand} from 'd3-scale';
+import {zoomIdentity} from 'd3-zoom';
 import {max} from 'd3-array';
+import {timeParse} from 'd3-time-format';
 import {Svg, Rect, G, Text as SvgText, Line} from 'react-native-svg';
 
 const bodyHeight = 400;
@@ -27,6 +29,9 @@ function radians_to_degrees(radians) {
   var pi = Math.PI;
   return radians * (180 / pi);
 }
+
+// const foo = zoomIdentity.translate(0, 10);
+// const yScale = foo.rescaleY(_yScale);
 
 const ChartViewer = () => {
   return (

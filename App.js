@@ -9,14 +9,16 @@
 import React from 'react';
 import {SafeAreaView, StyleSheet, StatusBar, Text} from 'react-native';
 import ChartViewer from './components/ChartViewer';
+import LineChart from './components/LineChart';
 
 const App = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.body}>
-        <Text style={styles.header}>Hello Barchart</Text>
+        <Text style={styles.header}>Hello D3</Text>
         <ChartViewer />
+        <LineChart />
       </SafeAreaView>
     </>
   );
@@ -31,7 +33,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginVertical: 16,
+    marginBottom: 4
   }
 });
 
