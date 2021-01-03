@@ -1,5 +1,5 @@
 import React, {useMemo, useState, useRef, useEffect} from 'react';
-import {StyleSheet, View, Button, Animated} from 'react-native';
+import {StyleSheet, Animated} from 'react-native';
 import MovieData from './MovieData';
 import {scaleLinear, scaleTime} from 'd3-scale';
 import {zoomIdentity} from 'd3-zoom';
@@ -32,24 +32,20 @@ const _xScale = scaleTime()
 
 const LineChart = () => {
   const [val, setVal] = useState(1);
-  const transformVal = useRef(new Animated.Value(val));
   const pinchScale = useRef(new Animated.Value(1));
   const state = useRef(State.UNDETERMINED);
 
   const xScale = useMemo(() => {
-    const _scale = zoomIdentity.scale(val, val);
+    const dx = -graphWidth * 0.5 * (val - 1);
+    const _scale = zoomIdentity.translate(dx, 0).scale(val, 1);
     return _scale.rescaleX(_xScale);
   }, [val]);
 
-  const yScale = useMemo(() => {
-    return _yScale;
-  }, []);
+  const yScale = _yScale;
 
-  const line = useMemo(() => {
-    return d3Line()
-      .x((d) => xScale(d.year))
-      .y((d) => yScale(d.value));
-  }, [xScale, yScale]);
+  const line = d3Line()
+    .x((d) => xScale(d.year))
+    .y((d) => yScale(d.value));
 
   const onPinchGestureEvent = Animated.event(
     [{nativeEvent: {scale: pinchScale.current}}],
@@ -62,11 +58,9 @@ const LineChart = () => {
 
   useEffect(() => {
     pinchScale.current.addListener(({value}) => {
-      if (value >= 1 && state.current === State.BEGAN) {
-        requestAnimationFrame(() => {
-          setVal(value);
-        });
-      }
+      requestAnimationFrame(() => {
+        setVal(value);
+      });
     });
   }, []);
 
@@ -133,7 +127,6 @@ const styles = StyleSheet.create({
     padding,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
   },
 });
 

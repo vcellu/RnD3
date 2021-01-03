@@ -8,7 +8,6 @@
 
 import React from 'react';
 import {SafeAreaView, StyleSheet, StatusBar, Text} from 'react-native';
-import ChartViewer from './components/ChartViewer';
 import LineChart from './components/LineChart';
 
 const App = () => {
@@ -28,12 +27,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center'
   },
   header: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 4
-  }
+   },
 });
 
 export default App;
