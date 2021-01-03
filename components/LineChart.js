@@ -6,9 +6,10 @@ import {zoomIdentity} from 'd3-zoom';
 import {max, extent} from 'd3-array';
 import {timeParse} from 'd3-time-format';
 import {line as d3Line} from 'd3-shape';
-import {Svg, G, Text as SvgText, Line, Path} from 'react-native-svg';
+import {Svg, G, Text as SvgText, Line, Path, Circle} from 'react-native-svg';
+import {PinchGestureHandler, State} from 'react-native-gesture-handler';
 
-const bodyHeight = 300;
+const bodyHeight = 600;
 const bodyWidth = 400;
 const padding = 32;
 const graphHeight = bodyHeight - padding;
@@ -31,18 +32,18 @@ const _xScale = scaleTime()
 
 const LineChart = () => {
   const [val, setVal] = useState(1);
-  const [disabled, setDisabled] = useState(false);
   const transformVal = useRef(new Animated.Value(val));
+  const pinchScale = useRef(new Animated.Value(1));
+  const state = useRef(State.UNDETERMINED);
 
   const xScale = useMemo(() => {
-    const _scale = zoomIdentity.scale(val, 1);
+    const _scale = zoomIdentity.scale(val, val);
     return _scale.rescaleX(_xScale);
   }, [val]);
 
   const yScale = useMemo(() => {
-    const _ty = zoomIdentity.translate(0, -val);
-    return _ty.rescaleY(_yScale);
-  }, [val]);
+    return _yScale;
+  }, []);
 
   const line = useMemo(() => {
     return d3Line()
@@ -50,30 +51,46 @@ const LineChart = () => {
       .y((d) => yScale(d.value));
   }, [xScale, yScale]);
 
+  const onPinchGestureEvent = Animated.event(
+    [{nativeEvent: {scale: pinchScale.current}}],
+    {useNativeDriver: true},
+  );
+
+  const onPinchHandlerStateChange = (event) => {
+    state.current = event.nativeEvent.oldState;
+  };
+
   useEffect(() => {
-    transformVal.current.addListener(({value}) => {
-      requestAnimationFrame(() => {
-        setVal(value);
-      });
+    pinchScale.current.addListener(({value}) => {
+      if (value >= 1 && state.current === State.BEGAN) {
+        requestAnimationFrame(() => {
+          setVal(value);
+        });
+      }
     });
   }, []);
 
-  const startAnimation = () => {
-    setDisabled(true);
-    Animated.timing(transformVal.current, {
-      toValue: val === 1 ? 4 : 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
-      setDisabled(false);
-    });
-  };
   return (
-    <>
-      <View style={styles.body}>
+    <PinchGestureHandler
+      onGestureEvent={onPinchGestureEvent}
+      onHandlerStateChange={onPinchHandlerStateChange}>
+      <Animated.View style={styles.body}>
         <Svg width={graphWidth} height={graphHeight}>
           <G x={leftAxisWidth}>
-            <Path d={line(movieData)} stroke="black" fill="none" />
+            <Path
+              d={line(movieData)}
+              stroke="black"
+              fill="none"
+              strokeWidth={2}
+            />
+            {movieData.map((item, i) => {
+              const cx = xScale(item.year);
+              const cy = yScale(item.value);
+              const r = 5;
+              const fill = 'black';
+
+              return <Circle {...{cx, cy, r, fill}} key={i} />;
+            })}
           </G>
           <G x={leftAxisWidth - 8} y={graphHeight - bottomAxisHeight}>
             <Line
@@ -82,7 +99,7 @@ const LineChart = () => {
               x2={graphWidth - leftAxisWidth + 16}
               y2={0}
               stroke="#BBBBBB"
-              strokeWidth="1"
+              strokeWidth="2"
             />
           </G>
 
@@ -102,9 +119,8 @@ const LineChart = () => {
             })}
           </G>
         </Svg>
-      </View>
-      <Button title="Animate" disabled={disabled} onPress={startAnimation} />
-    </>
+      </Animated.View>
+    </PinchGestureHandler>
   );
 };
 

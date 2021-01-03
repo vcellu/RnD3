@@ -17,7 +17,6 @@ const App = () => {
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.body}>
         <Text style={styles.header}>Hello D3</Text>
-        <ChartViewer />
         <LineChart />
       </SafeAreaView>
     </>
@@ -26,7 +25,7 @@ const App = () => {
 
 const styles = StyleSheet.create({
   body: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: 'white',
     flex: 1,
     alignItems: 'center',
   },
